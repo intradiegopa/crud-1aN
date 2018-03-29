@@ -1,21 +1,23 @@
 <?php
     require_once("database_lib.php");
     
-    $db = new DB("localhost", "aziendajax", "root", "");
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
 
-    header("location: index.html");
+    header('Content-Type: application/json');
 
-    if( isset($_POST["id"]) )
+    if( isset($_GET["id_azienda"]) )
     {   
-        $esito = $db->elimina_contatto($_POST["id"]);
+        $esito = $db->elimina_contatto($_GET["id_azienda"]);
+        
+        $a = var_dump($esito);
         
         if ($esito == "Error!" )
-            print("Si sono verificati errori, ripetere l'operazione.");
+            echo json_encode("Si sono verificati errori, ripetere l'operazione.$a");
         else
-            print("Il contatto è stato eliminato correttamente ($_POST[id])");
+            echo json_encode("L'azienda è stato eliminata correttamente ($_GET[id_azienda])");
             
     }else{
         
-         print("Parametri mancanti, ripetere l'operazione.");
+         echo json_encode("Parametri mancanti, ripetere l'operazione.$_GET[id_azienda]");
     }
            

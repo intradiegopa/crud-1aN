@@ -1,9 +1,7 @@
 <?php
     require_once("database_lib.php");
     
-    $db = new DB("localhost", "aziendajax", "root", "");
-//<form  name='elimina_contatto_form' action="elimina_contatto.php" method='post'>
-//</form>  
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
      if(  isset($_GET["id"]) )
     {  
         $contatti=$db->elenca_contatti_azienda($_GET["id"]);

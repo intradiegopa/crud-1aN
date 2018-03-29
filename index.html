@@ -134,6 +134,16 @@
         
         $(document).ready(function(){
             
+            $( "#tutti_i_contatti_grid" ).load( "contatti.php" );
+            $( "#tutte_le_aziende_grid" ).load( "aziende.php" );
+            
+            $.getJSON("id_azienda.php", function(result){
+               var listItems= "";
+                  for (var i = 0; i < result.Table.length; i++){
+                    listItems+= "<option value='"+result.Table[i].id_azienda+"'>" +result.Table[i].ragione_sociale+"</option>";
+                  }
+                $("#id_azienda_dw").html(listItems);
+            });
             
             $("#testo_da_cercare").change(function(){
                 var valore=$(this).val().toLowerCase();
@@ -142,13 +152,15 @@
                 }else{
                     $( ".demo-card-square").hide();
                     $( "div[name*='"+valore+"']" ).toggle();
-                    alert("Ricerca: "+valore);
-                }
-                  
+                    showDialog({
+                                title: "Ricerca",
+                                text: "Ricerca di: ["+valore+"]. ",
+                                negative: {
+                                    title: 'OK'
+                                }
+                            });
+                    }
             });
-
-            $( "#tutti_i_contatti_grid" ).load( "contatti.php" );
-            $( "#tutte_le_aziende_grid" ).load( "aziende.php" );
             
             $.getJSON("id_azienda.php", function(result){
                var listItems= "";
@@ -171,6 +183,27 @@
                                         title: 'OK'
                                     }
                                 });
+                        $( "#tutti_i_contatti_grid" ).load( "contatti.php" );
+                    }
+                });
+                return false;
+            });
+            
+            $('#modifica_contatto_form').submit(function(){ // catch the form's submit event
+                $.ajax({ // create an AJAX call...
+                    data: $('#modifica_contatto_form').serialize(), // get the form data
+                    type: $('#modifica_contatto_form').attr('method'), // GET or POST
+                    url: $('#modifica_contatto_form').attr('action'), // the file to call
+                    success: function(response) { // on success..
+                        showDialog({
+                                    title: "Esito",
+                                    text: response,
+                                    negative: {
+                                        title: 'OK'
+                                    }
+                                });
+                        $( "#tutti_i_contatti_grid" ).load( "contatti.php" );
+                        azione_cancel("tutti_i_contatti");
                     }
                 });
                 return false;
@@ -185,15 +218,43 @@
                         showDialog({
                                     title: "Esito",
                                     text: response,
-                                    //close:  location.reload(),
                                     negative: {
                                         title: 'OK'
                                     }
                                 });
+                        $.getJSON("id_azienda.php", function(result){
+               var listItems= "";
+                  for (var i = 0; i < result.Table.length; i++){
+                    listItems+= "<option value='"+result.Table[i].id_azienda+"'>" +result.Table[i].ragione_sociale+"</option>";
+                  }
+                  $("#id_azienda").html(listItems);
+            });
+                        azione_cancel("tutte_le_aziende");
                     }
                 });
                 return false;
             });
+            
+            $('#modifica_azienda_form').submit(function(){ // catch the form's submit event
+                $.ajax({ // create an AJAX call...
+                    data: $('#modifica_azienda_form').serialize(), // get the form data
+                    type: $('#modifica_azienda_form').attr('method'), // GET or POST
+                    url: $('#modifica_azienda_form').attr('action'), // the file to call
+                    success: function(response) { // on success..
+                        showDialog({
+                                    title: "Esito",
+                                    text: response,
+                                    negative: {
+                                        title: 'OK'
+                                    }
+                                });
+                        $( "#tutte_le_aziende_grid" ).load( "aziende.php" );
+                        azione_cancel("tutte_le_aziende");
+                    }
+                });
+                return false;
+            });
+            
         });
         
         function go_to_visualizza_contatto(id) {
@@ -257,6 +318,7 @@
 
         function go_to_modifica_contatto(id) {
 
+            
             // remove all is-active classes from tabs
             $('a.mdl-layout__tab').removeClass('is-active');
 
@@ -265,14 +327,6 @@
 
             // remove all is-active classes from panels
             $('.mdl-layout__tab-panel').removeClass('is-active');
-            
-            $.getJSON("id_azienda.php", function(result){
-               var listItems= "";
-                  for (var i = 0; i < result.Table.length; i++){
-                    listItems+= "<option value='"+result.Table[i].id_azienda+"'>" +result.Table[i].ragione_sociale+"</option>";
-                  }
-                  $("#id_azienda_m").html(listItems);
-            });
             
             //load data
             $.getJSON("json_contatto.php?id="+id+" ", function(result){
@@ -284,12 +338,13 @@
                     }
                 else{
                 
-                $('#cognome')[0].parentElement.MaterialTextfield.change(result.cognome);
-                $('#nome')[0].parentElement.MaterialTextfield.change(result.nome);
-                $('#email')[0].parentElement.MaterialTextfield.change(result.email);
-                $('#telefono')[0].parentElement.MaterialTextfield.change(result.telefono);
-                $('#titolo')[0].parentElement.MaterialTextfield.change(result.titolo);
-                $('#id_azienda_m')[0].parentElement.MaterialTextfield.change(result.id_azienda);
+                $('#cognome_dw')[0].parentElement.MaterialTextfield.change(result.cognome);
+                $('#nome_dw')[0].parentElement.MaterialTextfield.change(result.nome);
+                $('#email_dw')[0].parentElement.MaterialTextfield.change(result.email);
+                $('#telefono_dw')[0].parentElement.MaterialTextfield.change(result.telefono);
+                $('#titolo_dw')[0].parentElement.MaterialTextfield.change(result.titolo);
+                $('#id_azienda_dw')[0].parentElement.MaterialTextfield.change(result.id_azienda);
+                $('#id_contatto_dw').val(result.id_contatto);
             $('#azione_elimina_contatto').attr("onclick","elimina_contatto("+result.id_contatto+",'"+result.cognome+" "+result.nome+"')");
                 }
                 
@@ -312,13 +367,19 @@
 
             //load data
             $.getJSON("json_azienda.php?id="+id+" ", function(result){
-                
-                $('#nome_a') [0].parentElement.MaterialTextfield.change(result.ragione_sociale);
-                $('#piva_a')[0].parentElement.MaterialTextfield.change(result.partita_iva);
-                $('#telefono_a')[0].parentElement.MaterialTextfield.change(result.centralino);
-                $('#email_a')[0].parentElement.MaterialTextfield.change(result.email);
-                $('#id_azienda_k').val(result.id_azienda); $('#azione_elimina_azienda').attr("onclick","elimina_azienda("+result.id_azienda+",'"+result.ragione_sociale+"')");
-                $( "#list_a" ).load( "lista_a.php?id="+id+" " );
+                if(result == null)
+                    {
+                        location.reload();
+                        
+                    }
+                else{
+                $('#nome_up') [0].parentElement.MaterialTextfield.change(result.ragione_sociale);
+                $('#piva_up')[0].parentElement.MaterialTextfield.change(result.partita_iva);
+                $('#telefono_up')[0].parentElement.MaterialTextfield.change(result.centralino);
+                $('#email_up')[0].parentElement.MaterialTextfield.change(result.email);
+                $('#id_azienda_up').val(result.id_azienda); $('#azione_elimina_azienda').attr("onclick","elimina_azienda("+result.id_azienda+",'"+result.ragione_sociale+"')");
+                $( "#list_up" ).load( "lista_a.php?id="+id+" " );
+                }
             });
             
             // activate desired tab panel
@@ -326,94 +387,57 @@
         }
         
         function elimina_contatto(id,nome) {
-        showDialog({
-            title: "Sei sicuro di voler eliminare "+nome+"?",
-            text: 'Elimina per procedere. Annulla per tornare indietro!',
-            negative: {
-                title: 'Annulla'
-            },
-            positive: {
-                title: 'Elimina',
-                onClick: function (e) {
-                    //alert('Action performed!');
-                    //elimina_contatto_form
-                   $.getJSON("elimina_contatto.php?id_contatto="+id+" ", function(result){alert(result);});
-                   location.reload();
-                }
-            }
-        });
-        }
-        function elimina_azienda(id,nome) {
-        showDialog({
-            title: "Sei sicuro di voler eliminare "+nome+"?",
-            text: 'Elimina per procedere. Annulla per tornare indietro!',
-            negative: {
-                title: 'Annulla'
-            },
-            positive: {
-                title: 'Elimina',
-                onClick: function (e) {
-                    //alert('Action performed!');
-                    //elimina_contatto_form
-                   $.getJSON("elimina_azienda.php?id_contatto="+id+" ", function(result){
-                    alert(result);
-                   });
-                   location.reload();
-                }
-            }
-        });
-        }
-        function azione_a_submit(){
-            
             showDialog({
-            title: "Vuoi confermare le modifiche?",
-            text: 'OK per procedere. Annulla per tornare indietro!',
-            negative: {
-                title: 'Annulla'
-            },
-            positive: {
-                title: 'OK',
-                onClick: function (e) {
-                            $.ajax(
-                            {
-                                url : $('#modifica_azienda').attr("action"),
-                                type: $('#modifica_azienda').attr("method"),
-                                data : $('#modifica_azienda').serializeArray(),
-                                success:function(data, textStatus, jqXHR) 
-                                {
-                                    //data: return data from server
-                                    alert('it worked');
-                                    alert(this.data + "," + this.url);
-                                },
-                                error: function(jqXHR, textStatus, errorThrown) 
-                                {
-                                    //if fails   
-                                    alert('it didnt work');   
-                                }
-                            });
-                        }
-                  }
+                title: "Sei sicuro di voler eliminare "+nome+"?",
+                text: 'Elimina per procedere. Annulla per tornare indietro!',
+                negative: {
+                    title: 'Annulla'
+                },
+                positive: {
+                    title: 'Elimina',
+                    onClick: function (e) {
+                        $.getJSON("elimina_contatto.php?id_contatto="+id+" ", function(response){
+                            showDialog({
+                                        title: "Esito",
+                                        text: response,
+                                        negative: {
+                                            title: 'OK'
+                                        }
+                                    });
+                        });
+
+                    }
+                }
             });
         }
         
-        function azione_c_submit(){
+        
+        function elimina_azienda(id,nome) {
             showDialog({
-            title: "Vuoi confermare le modifiche ?",
-            text: 'OK per procedere. Annulla per tornare indietro!',
-            negative: {
-                title: 'Annulla'
-            },
-            positive: {
-                title: 'OK',
-                onClick: function (e) {
-                    //alert('Action performed!');
-                    //elimina_contatto_form
-                   $.getJSON("modifica_contatto.php?id_contatto="+id+" ", function(result){alert(result);});
-                   location.reload();
+                title: "Sei sicuro di voler ELIMINARE "+nome+" e TUTTI i suoi CONTATTI?",
+                text: 'Elimina per procedere. Annulla per tornare indietro!',
+                negative: {
+                    title: 'Annulla'
+                },
+                positive: {
+                    title: 'Elimina',
+                    onClick: function (e) {
+                        $.getJSON("elimina_azienda.php?id_azienda="+id+" ", function(response){
+                            showDialog({
+                                        title: "Esito",
+                                        text: response,
+                                        negative: {
+                                            title: 'OK'
+                                        }
+                                    });
+                        });
+
+                    }
                 }
-            }
-        });
+            });
         }
+        
+        
         
         function azione_cancel(prec){
             //prec = "tutti_i_contatti";
@@ -430,23 +454,6 @@
             
             // activate desired tab panel
             $("#"+prec).addClass('is-active');
-
-        }
-        
-        function myFunction() {
-            var input, filter, ul, li, a, i;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            ul = document.getElementById("myUL");
-            li = ul.getElementsByTagName("li");
-            for(i = 0; i < li.length; i++){
-                a = li[i].getElementsByTagName("a")[0];
-                if( a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                    li[i].style.display = "";
-                }else{
-                    li[i].style.display = "none";
-                }
-            }
         }
 </script>
     
@@ -470,10 +477,7 @@
              <a href="#nuovo" class="mdl-layout__tab">Nuovo</a>
             
       <a href="#temporary" class="mdl-layout__tab hidden">Di Lavoro</a>
-            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-shadow--4dp mdl-color--accent" onclick="" id="add" >
-            <i class="material-icons">add</i>
-            <span class="visuallyhidden">Add</span>
-          </button>
+            
             
            <!-- Displayed on Computer and Tablet -->
           <!-- Search -->
@@ -538,10 +542,10 @@
                     <h2 class="mdl-card__title-text">Modifica Contatto</h2>
                 </div>
                 <div class='mdl-card__supporting-text'>
-                <form  name='modifica_contatto' id='modifica_contatto'  action="modifica_contatto.php" method='post'>
-                    <input type="hidden" id="id_azienda_k">
+                <form  id='modifica_contatto_form'  action="modifica_contatto.php" method='post'>
+                    <input type="hidden" id="id_contatto_dw" name="id_contatto_dw">
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <select class="mdl-textfield__input" id="titolo" name="titolo">
+                <select class="mdl-textfield__input" id="titolo_dw" name="titolo_dw">
                   <option></option>
                   <option value="Sig.">Sig.</option>
                     <option value="Sig.ra">Sig.ra</option>
@@ -550,33 +554,33 @@
                     <option value="Dott.">Dott.</option>
                     <option value="Dott.ssa">Dott.ssa</option>
                     </select>
-                    <label class="mdl-textfield__label" for="titolo">Titolo</label>
+                    <label class="mdl-textfield__label" for="titolo_dw">Titolo</label>
                       </div> 
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" name="cognome" id="cognome">
-                    <label class="mdl-textfield__label" for="cognome">Cognome</label>
+                    <input class="mdl-textfield__input" type="text" name="cognome_dw" id="cognome_dw">
+                    <label class="mdl-textfield__label" for="cognome_dw">Cognome</label>
                   </div>
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" name="nome" id="nome">
-                    <label class="mdl-textfield__label" for="nome">Nome</label>
+                    <input class="mdl-textfield__input" type="text" name="nome_dw" id="nome_dw">
+                    <label class="mdl-textfield__label" for="nome_dw">Nome</label>
                   </div>   
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" name="email" id="email">
-                    <label class="mdl-textfield__label" for="email">Email</label>
+                    <input class="mdl-textfield__input" type="text" name="email_dw" id="email_dw">
+                    <label class="mdl-textfield__label" for="email_dw">Email</label>
                   </div>
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" name="telefono" id="telefono">
-                    <label class="mdl-textfield__label" for="telefono">Telefono</label>
+                    <input class="mdl-textfield__input" type="text" name="telefono_dw" id="telefono_dw">
+                    <label class="mdl-textfield__label" for="telefono_dw">Telefono</label>
                   </div>
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                     <select class="mdl-textfield__input" id="id_azienda_m" name="id_azienda_m">
+                     <select class="mdl-textfield__input" id="id_azienda_dw" name="id_azienda_dw">
                     </select>
-                    <label class="mdl-textfield__label" for="id_azienda_m">Azienda</label>
+                    <label class="mdl-textfield__label" for="id_azienda_dw">Azienda</label>
                 </div> 
                     <div class='mdl-card__actions mdl-card--border'>
-                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="azione_submit_contatto" onclick="azione_c_submit"><i class="material-icons">done</i>OK</button>
-                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="azione_cancel_contatto" onclick="azione_cancel('tutti_i_contatti')"><i class="material-icons">settings_backup_restore</i> Cancel</button>
-                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="azione_elimina_contatto"><i class="material-icons">delete</i> Elimina</button>
+                        <button id="submit" type="submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" ><i class="material-icons">done</i>OK</button>
+                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="azione_cancel('tutti_i_contatti')"><i class="material-icons">settings_backup_restore</i> Cancel</a>
+                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="azione_elimina_contatto"><i class="material-icons">delete</i> Elimina</a>
                     </div>
                 </form>
                 </div>
@@ -591,32 +595,34 @@
                     <h2 class="mdl-card__title-text">Modifica Azienda</h2>
                 </div>
                 <div class='mdl-card__supporting-text'>
-                    <form  name='modifica_azienda' id='modifica_azienda'  action="modifica_azienda.php" method='post'>
-                        <input type="hidden" id="id_azienda_k">
+                    <form id='modifica_azienda_form'  action="modifica_azienda.php" method='post'>
+                        <input type="hidden" id="id_azienda_up" name="id_azienda_up">
                          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input class="mdl-textfield__input" type="text" name="nome_a" id="nome_a">
-                            <label class="mdl-textfield__label" for="nome">Ragione Sociale</label>
+                            <input class="mdl-textfield__input" type="text" name="nome_up" id="nome_up">
+                            <label class="mdl-textfield__label" for="nome_up">Ragione Sociale</label>
                           </div> 
                           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input class="mdl-textfield__input" type="text" name="piva_a" id="piva_a">
-                            <label class="mdl-textfield__label" for="piva">Partita IVA</label>
+                            <input class="mdl-textfield__input" type="text" name="piva_up" id="piva_up">
+                            <label class="mdl-textfield__label" for="piva_up">Partita IVA</label>
                           </div>
                           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input class="mdl-textfield__input" type="text" name="email_a" id="email_a">
-                            <label class="mdl-textfield__label" for="email">Email</label>
+                            <input class="mdl-textfield__input" type="text" name="email_up" id="email_up">
+                            <label class="mdl-textfield__label" for="email_up">Email</label>
                           </div>
                           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input class="mdl-textfield__input" type="text" name="telefono_a" id="telefono_a">
-                            <label class="mdl-textfield__label" for="telefono">Telefono</label>
+                            <input class="mdl-textfield__input" type="text" name="telefono_up" id="telefono_up">
+                            <label class="mdl-textfield__label" for="telefono_up">Telefono</label>
                           </div>
                         <h6>Contatti:</h6>
-                        <div class="demo-list-action mdl-list" id="list_a"></div>
+                        <div class="demo-list-action mdl-list" id="list_up"></div>
+                        
+                         
                         <div class='mdl-card__actions mdl-card--border'>
-                            <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="azione_submit_azienda" onclick="azione_a_submit"><i class="material-icons">done</i>OK</button>
-                            <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="azione_cancel_azienda" onclick="azione_cancel('tutte_le_aziende')"><i class="material-icons">settings_backup_restore</i> Cancel</button>
-                            <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="azione_elimina_azienda"><i class="material-icons">delete</i> Elimina</button>
+                            <button id="submit" type="submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"><i class="material-icons">done</i>OK</button>
+                            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="azione_cancel('tutte_le_aziende')"><i class="material-icons">settings_backup_restore</i> Cancel</a>
+                            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="azione_elimina_azienda"><i class="material-icons">delete</i> Elimina</a>
                         </div>
-                    </form>
+                   </form>
                 </div>
             </div>
               </div>

@@ -1,7 +1,7 @@
 <?php
     require_once("database_lib.php");
     
-    $db = new DB("localhost", "aziendajax", "root", "");
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
 
     if(  isset($_GET["id"]) )
     {  
@@ -14,8 +14,8 @@
 
        
     }else{
-        
-         print("Errore: parametri mancanti, ripetere l'operazione.");
+         header('Content-Type: application/json');
+         echo json_encode("Errore: parametri mancanti, ripetere l'operazione.");
     }
             
 

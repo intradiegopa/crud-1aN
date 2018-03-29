@@ -1,6 +1,6 @@
 <? header('Content-Type: application/json'); 
     require_once("database_lib.php");
-    $db = new DB("localhost", "aziendajax", "root", "");
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
     $elenco=$db->elenca_aziende();
     $esito=array();
     $esito["Table"]=array();

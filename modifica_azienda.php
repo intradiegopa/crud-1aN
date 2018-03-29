@@ -1,41 +1,35 @@
 <?php
     require_once("database_lib.php");
     
-    $db = new DB("localhost", "aziendajax", "root", "");
-    if( isset( $_GET["id"] ) )
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
+    
+    if( isset($_POST[id_azienda_up]) && !empty($_POST[id_azienda_up]) && isset($_POST[piva_up]) && !empty($_POST[piva_up])  )
     {   
+        $telefono="";
+        $nome="";    
+        $email=""; 
         
-    $elenco=$db->elenca_una_azienda( $_GET["id"] );
-
-    foreach ($elenco as $row) {
-    ?>            
-        <div class="demo-card-square mdl-cell mdl-card mdl-cell--3-col mdl-shadow--2dp">
-          <div class="mdl-card__title mdl-card--expand">
-            <h2 class="mdl-card__title-text">
-                <?php echo $row['ragione_sociale']; ?></h2>
-          </div>
-          <div class="mdl-card__supporting-text">P.IVA <?php echo $row['partita_iva'];?></div>
-
-        <div class="mdl-card__actions mdl-card--border">
-            <div class="demo-list-action mdl-list">
-                <?php
-                    $contatti=$db->elenca_contatti_azienda($row['id_azienda']);
-                    foreach ($contatti as $un_contatto) {
-                    ?>            
-              <div class="mdl-list__item">
-                <span class="mdl-list__item-primary-content">
-                  <i class="material-icons mdl-list__item-avatar">person</i>
-                  <span>
-                      <?php echo ($un_contatto['titolo'].' '.$un_contatto['cognome'].' '.$un_contatto['nome']); ?>
-                    </span>
-                </span>
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="go_to_modifica_contatto(<?php echo($un_contatto['id_contatto']); ?>)"><i class="material-icons">star</i></a>
-              </div>
-                <?php } ?>
-            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick=" dettaglio_azienda(<?php echo $row['id_azienda']; ?>)">Contatti</a>
-        </div>
-     </div>
-</div>
-<?php 
+        $id = $_POST[id_azienda_up];
+        
+        $piva = $_POST[piva_up];
+        
+        if( isset($_POST[nome_up])  && !empty($_POST[nome_up]) ) $nome = $_POST[nome_up];
+        
+        if( isset($_POST[telefono_up]) && !empty($_POST[telefono_up]) ) $telefono = $_POST[telefono_up];
+        
+        if( isset($_POST[email_up]) && !empty($_POST[email_up]) ) $email = $_POST[email_up];
+        
+        $esito = $db->modifica_azienda($id, $nome, $piva, $telefono, $email);
+        
+        if ($esito=="Error!")
+            
+            print("Si sono verificati errori, ripetere l'operazione.");
+        
+        else
+            
+            print("L'azienda è stata modificata correttamente($id).");
+    
+    }else{
+        
+     print("Parametri mancanti, ripetere l'operazione.");
     }
-}

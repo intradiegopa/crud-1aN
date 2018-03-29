@@ -11,6 +11,22 @@ class DB {
                     //$error = $e->getMessage();
                 }
         }
+        public function elimina_azienda($id) {
+            
+            $query = "DELETE FROM Contatti WHERE id_azienda=$id;";
+            $statement = $this->pdo->prepare($query);
+            try { 
+                $statement->execute();
+                $query = "DELETE FROM Aziende WHERE id_azienda=$id;";
+                $statement = $this->pdo->prepare($query);
+                
+                return $statement->rowCount();
+                
+            } catch(PDOExecption $e) {  
+                return "Error!"; 
+            }
+            
+        }
         public function elimina_contatto($id) {
             
             $query = "DELETE FROM Contatti WHERE id_contatto=$id;";
@@ -38,13 +54,37 @@ class DB {
             }
             
         }
+    public function modifica_contatto($id, $nome, $cognome, $email, $telefono, $titolo, $id_azienda) {
+            
+            $query = "UPDATE Contatti SET nome = '$nome', cognome = '$cognome', email = '$email', telefono = '$telefono', titolo = '$titolo', id_azienda = '$id_azienda' WHERE id_contatto = $id;";
+            $statement = $this->pdo->prepare($query);
+            try { 
+                $statement->execute();
+                return $statement->rowCount();
+                
+            } catch(PDOExecption $e) {  
+                return "Error!"; 
+            }
+            
+        }
     public function inserisci_azienda($nome, $piva, $telefono, $email) {
                 $query = "INSERT INTO Aziende (ragione_sociale, partita_iva, centralino, email)
                 VALUES ('$nome', '$piva', '$telefono', '$email');";
                 $statement = $this->pdo->prepare($query);
-                try { 
+            try { 
                 $statement->execute();
                 return $this->pdo->lastInsertId();
+                
+            } catch(PDOExecption $e) {  
+                return "Error!"; 
+            }
+        }
+    public function modifica_azienda($id, $nome, $piva, $telefono, $email) {
+                $query = "UPDATE Aziende SET ragione_sociale = '$nome' , partita_iva = '$piva' , centralino = '$telefono' , email = '$email' WHERE id_azienda = $id;";
+                $statement = $this->pdo->prepare($query);
+            try { 
+                $statement->execute();
+                return $statement->rowCount();
                 
             } catch(PDOExecption $e) {  
                 return "Error!"; 
@@ -59,17 +99,6 @@ class DB {
         }
     public function elenca_una_azienda($id_azienda) {
                 $query = "SELECT * FROM Aziende WHERE id_azienda=$id_azienda limit 1";
-                $statement = $this->pdo->prepare($query);
-                $statement->execute();
-                $data = $statement->fetchAll(PDO::FETCH_ASSOC);
-                return $data;
-        }
-    public function cerca_azienda_contatto($id_contatto) {
-                $query = "SELECT Aziende.ragione_sociale 
-                            FROM Aziende 
-                            INNER JOIN Contatti on Contatti.id_filiale = Aziende.id_azienda
-                            WHERE id_contatto = $id_contatto
-                            limit 1;";
                 $statement = $this->pdo->prepare($query);
                 $statement->execute();
                 $data = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -100,22 +129,6 @@ class DB {
     public function seleziona_una_azienda($id_azienda){
                 $id_azienda = trim(filter_var($id_azienda, FILTER_SANITIZE_STRING));
                 $query = "SELECT * FROM Aziende WHERE id_azienda=$id_azienda;";
-                $statement = $this->pdo->prepare($query);
-                $statement->execute();
-                $data = $statement->fetchAll(PDO::FETCH_ASSOC);
-                return $data;
-        }
-    public function ottieni_nome_filiale($id_filiale){
-                $id_filiale = trim(filter_var($id_filiale, FILTER_SANITIZE_STRING));
-                $query = "SELECT Nome FROM Filiali WHERE id_filiale=$id_filiale;";
-                $statement = $this->pdo->prepare($query);
-                $statement->execute();
-                $data = $statement->fetchAll(PDO::FETCH_ASSOC);
-                return $data;
-        }
-    public function ottieni_apparati($id_contatto){
-                $id_contatto = trim(filter_var($id_contatto, FILTER_SANITIZE_STRING));
-                $query = "SELECT * FROM Apparati WHERE id_contatto=$id_contatto;";
                 $statement = $this->pdo->prepare($query);
                 $statement->execute();
                 $data = $statement->fetchAll(PDO::FETCH_ASSOC);

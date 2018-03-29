@@ -1,7 +1,7 @@
 <?php
     require_once("database_lib.php");
     
-    $db = new DB("localhost", "aziendajax", "root", "");
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
 
     header("location: index.html");
 
@@ -12,15 +12,14 @@
         if ($eesito == "Error!" )
             $esito="Si sono verificati errori, ripetere l'operazione.";
         else
-            $esito="Il contatto è stato eliminato correttamente ($_GET[id])";
+            $esito="Il contatto è stato eliminato correttamente ($_GET[id_contatto])";
             
     }else{
         
         $esito="Parametri mancanti, ripetere l'operazione.";
     }
-
-        header('Content-Type: application/json');
-        echo json_encode($esito);
+    header('Content-Type: application/json');
+    echo json_encode($esito);
     
             
            

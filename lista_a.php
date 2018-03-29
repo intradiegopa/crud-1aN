@@ -1,7 +1,7 @@
 <?php
     require_once("database_lib.php");
     
-    $db = new DB("localhost", "aziendajax", "root", "");
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
 //<form  name='elimina_contatto_form' action="elimina_contatto.php" method='post'>
 //</form>  
      if(  isset($_GET["id"]) )

@@ -1,13 +1,13 @@
 <?php
     require_once("database_lib.php");
     
-    $db = new DB("localhost", "aziendajax", "root", "");
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
 
     $elenco=$db->elenca_contatti();
 
     foreach ($elenco as $row) {
     ?>            
-        <div class="demo-card-square mdl-cell mdl-card mdl-cell--3-col mdl-shadow--2dp">
+        <div class="demo-card-square mdl-cell mdl-card mdl-cell--3-col mdl-shadow--2dp" name="<?php echo( strtolower( "$row[titolo] $row[cognome] $row[nome]" )); ?>">
           <div class="mdl-card__title mdl-card--expand">
             <h2 class="mdl-card__title-text">
                 <?php echo "$row[titolo] $row[cognome] $row[nome]"; ?>

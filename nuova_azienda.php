@@ -1,7 +1,7 @@
 <?php
     require_once("database_lib.php");
     
-    $db = new DB("localhost", "aziendajax", "root", "");
+    $db = new DB("localhost", "my_intradiego", "intradiego", "");
 
     if( isset($_POST["nome"]) && !empty($_POST["nome"]) && isset($_POST["piva"]) && !empty($_POST["piva"])  )
     {   
